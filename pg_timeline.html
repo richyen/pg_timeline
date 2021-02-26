@@ -1,0 +1,43 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+<script type="text/javascript">
+  google.charts.load("current", {packages:["timeline"]});
+  google.charts.setOnLoadCallback(drawChart);
+  function drawChart() {
+  $.ajax({
+    url: "queries.json",
+    dataType: "json",
+   }).done(function(json) {
+
+    var container = document.getElementById('example5.2');
+    var chart = new google.visualization.Timeline(container);
+
+    var data = [];//[["PID","Start","End","Query"]];
+    $.each(json, function() {
+      var end = new Date(0,0,0,11,33,00);
+      end.setMilliseconds(end.getMilliseconds() + (this.end * 1000));
+      var start = new Date(end.getTime());
+      start.setMilliseconds(start.getMilliseconds() - this.duration);
+      var item = [this.pid,this.query,start,end];
+      data.push(item);
+    });
+    //console.log(data);
+    var dataTable = new google.visualization.DataTable();
+    dataTable.addColumn({ type: 'string', id: 'PID' });
+    dataTable.addColumn({ type: 'string', id: 'Query' });
+    dataTable.addColumn({ type: 'date', id: 'Start' });
+    dataTable.addColumn({ type: 'date', id: 'End' });
+    dataTable = google.visualization.arrayToDataTable(data);
+
+    var options = {
+      timeline: {},
+    };
+
+    chart.draw(dataTable, options);
+});
+  }
+</script>
+
+<div id="example5.2" style="height: 100%;"></div>
